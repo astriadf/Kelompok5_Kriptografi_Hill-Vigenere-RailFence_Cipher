@@ -1,62 +1,30 @@
 # =============================================================================
-# HILL CIPHER — Core Engine Module
-# =============================================================================
-# Implementasi algoritma Hill Cipher menggunakan Pure Python.
-# TIDAK ADA IMPORT/LIBRARY/PACKAGE yang digunakan dalam file ini.
-# Seluruh operasi matematika (GCD, determinan, invers modular,
-# invers matriks, perkalian matriks) diimplementasikan dari nol.
-#
-# Mendukung:
-#   - Matriks kunci 2x2 dan 3x3
-#   - Enkripsi dan dekripsi Hill Cipher
-#   - Validasi matriks (gcd(det(K), 26) == 1)
-#   - Padding 'X' dengan metadata panjang plaintext asli
-#   - Output dict terstruktur untuk GUI dan pipeline kelompok
-#
-# Alfabet: A=0, B=1, ..., Z=25
-#
-# Cara penggunaan:
-#   enc = hill_encrypt("RAHASIA", [[3,10],[15,9]])
-#   dec = hill_decrypt(enc["ciphertext"], [[3,10],[15,9]], enc["original_plaintext_length"])
-# =============================================================================
-
-
-# =============================================================================
 # BAGIAN 1: Utilitas Alfabet
 # =============================================================================
 
 def char_to_num(char):
-    """
-    Mengubah satu huruf kapital menjadi nilai numerik 0-25.
-    Rumus: ord(char) - ord('A')
-    Contoh: 'A' -> 0, 'R' -> 17, 'Z' -> 25
-    """
-    # ord() adalah fungsi built-in Python, bukan library — diizinkan
+    # Mengubah satu huruf kapital menjadi nilai numerik 0-25. Contoh: 'A' -> 0, 'B' -> 1, 'Z' -> 25
+    # ord() adalah fungsi built-in Python
     return ord(char) - ord('A')
 
 
 def num_to_char(num):
-    """
-    Mengubah nilai numerik 0-25 menjadi huruf kapital.
-    Rumus: chr(num mod 26 + ord('A'))
-    Menggunakan mod positif agar hasilnya selalu dalam rentang 0-25.
-    Contoh: 0 -> 'A', 25 -> 'Z', 26 -> 'A'
-    """
-    # chr() adalah fungsi built-in Python, bukan library — diizinkan
+    # Mengubah nilai numerik 0-25 menjadi huruf kapital
+    # Menggunakan mod positif agar hasilnya selalu dalam rentang 0-25.
+    # chr() adalah fungsi built-in Python
     return chr(positive_mod(num, 26) + ord('A'))
 
 
 def normalize_plaintext(text):
     """
-    Menormalisasi teks masukan:
+    Menormalisasi teks masukan agar hanya bekerja dengan alfabet A-Z (26 huruf):
       - Ubah semua karakter ke huruf kapital
       - Hapus semua karakter yang bukan huruf A-Z
-    Tujuan: Hill Cipher hanya bekerja dengan alfabet A-Z (26 huruf).
     Contoh: 'Aku pergi!' -> 'AKUPERGI'
     """
     result = ""
     for char in text:
-        # upper() adalah method str bawaan Python — diizinkan
+        # upper() adalah method str bawaan Python
         upper_char = char.upper()
         # Cek apakah karakter termasuk A-Z
         if 'A' <= upper_char <= 'Z':
@@ -69,45 +37,30 @@ def normalize_plaintext(text):
 # =============================================================================
 
 def positive_mod(a, m):
-    """
-    Menghitung modulo dengan hasil selalu positif (>= 0).
-    Python sebenarnya sudah mengembalikan modulo positif untuk m > 0,
-    tetapi fungsi ini dibuat eksplisit agar logika jelas.
-    Diperlukan karena Python's % untuk bilangan negatif berbeda
-    dengan definisi matematis modulo di beberapa konteks.
-    Contoh: positive_mod(-123, 26) -> 7
-    """
+    # Mengubah hasil modulo agar selalu berada pada rentang 0 sampai m-1.
+    # Digunakan pada saat hasil operasi matriks bernilai negatif.
+    # Contoh: positive_mod(-123, 26) -> 7.
     return ((a % m) + m) % m
 
 
 def gcd(a, b):
-    """
-    Menghitung Greatest Common Divisor (GCD) menggunakan
-    Algoritma Euclidean iteratif.
-    Algoritma: selama b != 0, lakukan a, b = b, a mod b
-    Hasil akhir adalah GCD dari |a| dan |b|.
-    Contoh: gcd(7, 26) = 1, gcd(2, 26) = 2
-    """
+    # Menghitung GCD dari dua bilangan menggunakan algoritma Euclidean.
     # Pastikan kedua nilai positif
     if a < 0:
         a = -a
     if b < 0:
         b = -b
-    # Algoritma Euclidean iteratif
+    # Gunakan algoritma Euclidean sampai sisa pembagian bernilai 0.
     while b != 0:
         a, b = b, a % b
     return a
 
 
 def mod_inverse(a, m):
-    """
-    Menghitung invers modular dari a terhadap m menggunakan
-    Extended Euclidean Algorithm.
-    Mencari x sehingga (a * x) ≡ 1 (mod m).
-    Mengembalikan None jika invers tidak ada (gcd(a, m) != 1).
-    Contoh: mod_inverse(7, 26) = 15  (karena 7 * 15 = 105 ≡ 1 mod 26)
-    """
-    # Normalisasi nilai a ke range positif mod m
+    # Menghitung invers modular dari a terhadap m
+    # Mencari x sehingga (a * x) ≡ 1 (mod m).
+    
+    # Pastikan a berada dalam rentang 0 sampai m - 1 
     a = positive_mod(a, m)
 
     # Extended Euclidean Algorithm
@@ -115,16 +68,17 @@ def mod_inverse(a, m):
     old_r, r = a, m
     old_s, s = 1, 0
 
+    # Cari GCD sekaligus koefisien untuk mendapatkan invers
     while r != 0:
         quotient = old_r // r
         old_r, r = r, old_r - quotient * r
         old_s, s = s, old_s - quotient * s
 
-    # Jika GCD != 1, invers tidak ada
+    # Jika GCD bukan 1, a tidak punya invers modulo m
     if old_r != 1:
         return None
 
-    # Kembalikan hasil dalam range positif
+    # Ambil hasil akhirnya dalam rentang modulo m
     return positive_mod(old_s, m)
 
 
@@ -133,25 +87,20 @@ def mod_inverse(a, m):
 # =============================================================================
 
 def determinant_2x2(K):
-    """
-    Menghitung determinan matriks 2x2.
-    Rumus: det(K) = K[0][0]*K[1][1] - K[0][1]*K[1][0]
-    Yaitu: ad - bc
-    Contoh: K = [[3,10],[15,9]] -> det = 3*9 - 10*15 = 27 - 150 = -123
-    """
+    # Menghitung determinan matriks 2x2.
+    # Rumus: det(K) = K[0][0]*K[1][1] - K[0][1]*K[1][0], yaitu: ad - bc
+
     return K[0][0] * K[1][1] - K[0][1] * K[1][0]
 
 
 def determinant_3x3(K):
     """
-    Menghitung determinan matriks 3x3 menggunakan ekspansi kofaktor
-    sepanjang baris pertama (Laplace Expansion).
+    Menghitung determinan matriks 3x3 menggunakan ekspansi kofaktor sepanjang baris pertama (Laplace Expansion).
     Rumus:
       det = K[0][0] * (K[1][1]*K[2][2] - K[1][2]*K[2][1])
           - K[0][1] * (K[1][0]*K[2][2] - K[1][2]*K[2][0])
           + K[0][2] * (K[1][0]*K[2][1] - K[1][1]*K[2][0])
-    Setiap suku adalah elemen baris pertama dikali determinan
-    matriks minor 2x2 yang tersisa (dengan tanda +, -, +).
+    Setiap suku adalah elemen baris pertama dikali determinan matriks minor 2x2 yang tersisa (dengan tanda +, -, +).
     """
     # Ekspansi kofaktor pada baris pertama
     term0 = K[0][0] * (K[1][1] * K[2][2] - K[1][2] * K[2][1])
@@ -161,17 +110,13 @@ def determinant_3x3(K):
 
 
 def determinant(K):
-    """
-    Menghitung determinan matriks (2x2 atau 3x3).
-    Mendelegasikan ke fungsi spesifik berdasarkan ukuran matriks.
-    """
+    # Pilih perhitungan determinan berdasarkan ukuran matriks
     size = len(K)
     if size == 2:
         return determinant_2x2(K)
     elif size == 3:
         return determinant_3x3(K)
     else:
-        # Ukuran matriks tidak didukung oleh modul ini
         raise ValueError("Ukuran matriks tidak didukung. Gunakan 2x2 atau 3x3.")
 
 
@@ -666,10 +611,7 @@ def format_matrix(matrix):
 
 
 def format_encrypt_result(result):
-    """
-    Menghasilkan ringkasan enkripsi yang siap ditampilkan oleh GUI.
-    Mengembalikan string multi-baris dengan semua informasi proses.
-    """
+    # Menghasilkan ringkasan enkripsi untuk ditampilkan oleh GUI.
     if not result["success"]:
         return "ERROR: " + result["error"]
 
@@ -708,7 +650,7 @@ def format_encrypt_result(result):
 
 def format_decrypt_result(result):
     """
-    Menghasilkan ringkasan dekripsi yang siap ditampilkan oleh GUI.
+    Menghasilkan ringkasan dekripsi untuk ditampilkan oleh GUI.
     """
     if not result["success"]:
         return "ERROR: " + result["error"]
@@ -733,36 +675,3 @@ def format_decrypt_result(result):
     return "\n".join(lines)
 
 
-# =============================================================================
-# BAGIAN 9: Demo interaktif (opsional, dijalankan jika file ini dieksekusi
-#           langsung dengan: python hill_cipher.py)
-# =============================================================================
-
-if __name__ == "__main__":
-    # Demo menggunakan contoh dari materi kuliah
-    print("=" * 55)
-    print("  DEMO HILL CIPHER — Contoh dari Materi Kuliah")
-    print("=" * 55)
-
-    key = [[3, 10], [15, 9]]
-    text = "RAHASIA"
-
-    print("\nPlaintext : {}".format(text))
-    print("Kunci     :\n{}".format(format_matrix(key)))
-
-    # Enkripsi
-    enc = hill_encrypt(text, key)
-    print("\n" + format_encrypt_result(enc))
-
-    # Dekripsi
-    dec = hill_decrypt(enc["ciphertext"], key, enc["original_plaintext_length"])
-    print("\n" + format_decrypt_result(dec))
-
-    # Validasi round-trip
-    print("\nRound-trip: {} -> {} -> {}".format(
-        enc["normalized_plaintext"], enc["ciphertext"], dec["plaintext"]
-    ))
-    if dec["plaintext"] == enc["normalized_plaintext"]:
-        print("Validasi  : MATCH")
-    else:
-        print("Validasi  : TIDAK MATCH — ada bug!")
