@@ -58,13 +58,13 @@ class CryptoGUI:
             pady=(15, 3)
         )
 
-        subtitle = tk.Label(
+        self.subtitle = tk.Label(
             self.root,
             text="Hill → Vigenère → Rail Fence",
             font=("Arial", 11)
         )
 
-        subtitle.pack(
+        self. subtitle.pack(
             pady=(0, 10)
         )
 
@@ -89,6 +89,7 @@ class CryptoGUI:
         self.mode = tk.StringVar(
             value="encrypt"
         )
+        self.mode.trace_add("write", self.mode_changed)
 
         tk.Radiobutton(
             mode_frame,
@@ -134,10 +135,12 @@ class CryptoGUI:
         # PLAINTEXT / CIPHERTEXT
         # --------------------------------------------------------
 
-        tk.Label(
+        self.input_label = tk.Label(
             config_frame,
             text="Plaintext:"
-        ).grid(
+        )
+
+        self.input_label.grid(
             row=0,
             column=0,
             padx=(0, 5),
@@ -414,6 +417,32 @@ class CryptoGUI:
             fill="x",
             side="bottom"
         )
+
+    # ============================================================
+    # EVENTS
+    # ============================================================
+
+    def mode_changed(self, *args):
+        if self.mode.get() == "encrypt":
+            # Label input
+            self.input_label.config(text="Plaintext:")
+            # Alur proses
+            self.subtitle.config(
+                text="Hill → Vigenère → Rail Fence"
+            )
+            self.status_var.set(
+                "Mode Enkripsi: Hill → Vigenère → Rail Fence"
+            )
+        else:
+            # Label input
+            self.input_label.config(text="Ciphertext:")
+            # Alur proses
+            self.subtitle.config(
+                text="Rail Fence → Vigenère → Hill"
+            )
+            self.status_var.set(
+                "Mode Dekripsi: Rail Fence → Vigenère → Hill"
+            )
 
     # ============================================================
     # MATRIX
@@ -943,24 +972,6 @@ class CryptoGUI:
         self.output_text.config(
             state="disabled"
         )
-
-    # ============================================================
-    # MODE
-    # ============================================================
-
-    def mode_changed(self):
-
-        if self.mode.get() == "encrypt":
-
-            self.status_var.set(
-                "Mode Enkripsi: Hill → Vigenère → Rail Fence"
-            )
-
-        else:
-
-            self.status_var.set(
-                "Mode Dekripsi: Rail Fence → Vigenère → Hill"
-            )
 
     # ============================================================
     # UPLOAD TXT
