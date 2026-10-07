@@ -170,14 +170,14 @@ class TestVisualizationData(unittest.TestCase):
         self.assertEqual(r["grid"][4][4], "W")
 
     def test_format_rail_grid_exact(self):
-        esperado = "\n".join([
+        expected = "\n".join([
             "Rail 1  R . . . . . . .",
             "Rail 2  . J . . . . . X",
             "Rail 3  . . I . . . J .",
             "Rail 4  . . . Z . S . .",
             "Rail 5  . . . . W . . .",
         ])
-        self.assertEqual(format_rail_grid(rail_fence_encrypt("RJIZWSJX")["grid"]), esperado)
+        self.assertEqual(format_rail_grid(rail_fence_encrypt("RJIZWSJX")["grid"]), expected)
 
 
 class TestFullPipelineIntegration(unittest.TestCase):

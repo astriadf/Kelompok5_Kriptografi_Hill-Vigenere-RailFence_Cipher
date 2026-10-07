@@ -34,6 +34,7 @@ class CryptoGUI:
 
         # Menyimpan panjang plaintext asli
         self.original_plaintext_length = None
+        self.last_final_result = None
 
         self.create_widgets()
 
@@ -160,7 +161,7 @@ class CryptoGUI:
             "RAHASIA"
         )
 
-        # Upload
+        # Ambil isi file TXT ke kolom input
         self.upload_button = tk.Button(
             config_frame,
             text="UPLOAD TXT",
@@ -442,7 +443,6 @@ class CryptoGUI:
                 [20, 17, 15]
             ]
 
-        # Matrix dibuat horizontal/inline
         for i in range(size):
 
             row = []
@@ -779,7 +779,7 @@ class CryptoGUI:
                     "============================================================\n\n"
                     f"{rail_text}\n"
                 )
-
+                self.last_final_result = rail_text
                 self.show_result(
                     result
                 )
@@ -886,7 +886,7 @@ class CryptoGUI:
                     "============================================================\n\n"
                     f"{hill_text}\n"
                 )
-
+                self.last_final_result = hill_text
                 self.show_result(
                     result
                 )
@@ -1033,10 +1033,7 @@ class CryptoGUI:
 
     def save_result(self):
 
-        result = self.output_text.get(
-            "1.0",
-            "end-1c"
-        ).strip()
+        result = (self.last_final_result or "").strip()
 
         if not result:
 
@@ -1129,6 +1126,7 @@ class CryptoGUI:
         )
 
         self.original_plaintext_length = None
+        self.last_final_result = None
 
         # Reset matrix ke 2x2
         self.matrix_size.set(

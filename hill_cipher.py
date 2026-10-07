@@ -1,45 +1,31 @@
-# =============================================================================
-# BAGIAN 1: Utilitas Alfabet
-# =============================================================================
+# Utilitas alfabet
 
 def char_to_num(char):
-    # Mengubah satu huruf kapital menjadi nilai numerik 0-25. Contoh: 'A' -> 0, 'B' -> 1, 'Z' -> 25
-    # ord() adalah fungsi built-in Python
+    # Huruf kapital ke angka 0-25, contoh 'A' -> 0
     return ord(char) - ord('A')
 
 
 def num_to_char(num):
-    # Mengubah nilai numerik 0-25 menjadi huruf kapital
-    # Menggunakan mod positif agar hasilnya selalu dalam rentang 0-25.
-    # chr() adalah fungsi built-in Python
+    # Angka 0-25 ke huruf kapital, selalu dimoduluskan agar tidak negatif
     return chr(positive_mod(num, 26) + ord('A'))
 
 
 def normalize_plaintext(text):
     """
-    Menormalisasi teks masukan agar hanya bekerja dengan alfabet A-Z (26 huruf):
-      - Ubah semua karakter ke huruf kapital
-      - Hapus semua karakter yang bukan huruf A-Z
-    Contoh: 'Aku pergi!' -> 'AKUPERGI'
+    Sisakan huruf A-Z kapital saja, contoh 'Aku pergi!' -> 'AKUPERGI'.
     """
     result = ""
     for char in text:
-        # upper() adalah method str bawaan Python
         upper_char = char.upper()
-        # Cek apakah karakter termasuk A-Z
         if 'A' <= upper_char <= 'Z':
             result += upper_char
     return result
 
 
-# =============================================================================
-# BAGIAN 2: Operasi Modular Aritmetika
-# =============================================================================
+# Aritmetika modular
 
 def positive_mod(a, m):
-    # Mengubah hasil modulo agar selalu berada pada rentang 0 sampai m-1.
-    # Digunakan pada saat hasil operasi matriks bernilai negatif.
-    # Contoh: positive_mod(-123, 26) -> 7.
+    # Sisa bagi yang selalu positif, contoh positive_mod(-123, 26) -> 7
     return ((a % m) + m) % m
 
 
@@ -82,9 +68,7 @@ def mod_inverse(a, m):
     return positive_mod(old_s, m)
 
 
-# =============================================================================
-# BAGIAN 3: Operasi Matriks
-# =============================================================================
+# Operasi matriks
 
 def determinant_2x2(K):
     # Menghitung determinan matriks 2x2.
@@ -225,9 +209,7 @@ def inverse_matrix_3x3(K, det_inv_mod26):
     return result
 
 
-# =============================================================================
-# BAGIAN 4: Validasi Matriks
-# =============================================================================
+# Validasi matriks kunci
 
 def validate_matrix(K):
     """
@@ -304,9 +286,7 @@ def validate_matrix(K):
     }
 
 
-# =============================================================================
-# BAGIAN 5: Pemrosesan Blok (Block Processing)
-# =============================================================================
+# Pembagian blok dan padding
 
 def divide_into_blocks(text, block_size):
     """
@@ -345,9 +325,7 @@ def divide_into_blocks(text, block_size):
     }
 
 
-# =============================================================================
-# BAGIAN 6: Enkripsi Hill Cipher
-# =============================================================================
+# Enkripsi: C = K x P mod 26 per blok
 
 def hill_encrypt(plaintext, key_matrix):
     """
@@ -464,9 +442,7 @@ def hill_encrypt(plaintext, key_matrix):
     }
 
 
-# =============================================================================
-# BAGIAN 7: Dekripsi Hill Cipher
-# =============================================================================
+# Dekripsi: P = K^-1 x C mod 26, padding dipotong pakai panjang asli
 
 def hill_decrypt(ciphertext, key_matrix, original_plaintext_length=None):
     """
@@ -587,9 +563,7 @@ def hill_decrypt(ciphertext, key_matrix, original_plaintext_length=None):
     }
 
 
-# =============================================================================
-# BAGIAN 8: Utilitas Tampilan (untuk GUI dan laporan)
-# =============================================================================
+# Bantuan tampilan untuk GUI
 
 def format_blocks(blocks):
     """

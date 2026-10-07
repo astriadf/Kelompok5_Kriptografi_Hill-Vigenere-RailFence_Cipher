@@ -5,7 +5,6 @@
 # Kontrak: rail_fence_encrypt(plaintext, rails=5) -> {success, error, ..., ciphertext},
 #          rail_fence_decrypt(ciphertext, rails=5) -> {success, error, ..., plaintext}.
 # Acuan: RJIZWSJX + k=5 -> RJXIJZSW. Pure Python, tanpa import agar standalone.
-#
 # Konvensi data visualisasi (untuk tim GUI):
 #   - "index" / "positions" memakai indeks posisi 0-based pada teks (sama seperti Vigenere).
 #   - "rail" memakai nomor 1-based (Rail 1 = paling atas) agar sama dengan tampilan PRD.
